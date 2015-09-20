@@ -10,6 +10,7 @@ var _store = {
 };
 
 var loginStatus = function(result){
+    console.log('loginStatus result: ' + result);
     _store.result = result;
 };
 
@@ -30,14 +31,11 @@ var loginStore = objectAssign({}, EventEmitter.prototype, {
 AppDispatcher.register(function(payload){
     var action = payload.action;
     switch(action.actionType){
-        case appConstants.LOGIN_SUCCESS:
-            loginStatus(action.data);
+        case appConstants.LOGIN_EVENT:
+            loginStatus(action.data.result);
             loginStore.emit(CHANGE_EVENT);
             break;
-        case appConstants.LOGIN_ERROR:
-            loginStatus(action.data);
-            loginStore.emit(CHANGE_EVENT);
-            break;
+
         default:
             return true;
     }

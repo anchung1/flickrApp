@@ -12,18 +12,19 @@ var Login = React.createClass({
         var pw = this.refs.pwInput.getDOMNode().value;
 
         if (user && pw) {
-            loginActions.loginAction({user: user, pw: pw});
+            loginActions.login({user: user, pw: pw});
         }
     },
 
     render: function() {
 
-        var header = <div>Header NONE</div>;
+        console.log('render Login');
+        var header = <div></div>;
         if (!this.props.status) {
             header = <h3 className="text-center">Nick's Login</h3>
         }
 
-        var body = <div>Body NONE</div>;
+        var body = <div></div>;
         if (!this.props.status) {
             body =
                 <div>
