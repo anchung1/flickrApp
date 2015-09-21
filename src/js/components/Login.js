@@ -25,7 +25,7 @@ var Login = React.createClass({
 
     render: function() {
 
-        console.log('render Login');
+        //console.log('render Login');
         var header = <div></div>;
         if (!this.props.status) {
             header = <h3 className="text-center">Nick's Login</h3>

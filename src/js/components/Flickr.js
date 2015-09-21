@@ -2,18 +2,12 @@ var React = require('react');
 
 var Login = React.createClass({
 
-    getInitialState: function () {
-        return {
-            imageIndex: 0
-        };
-    },
-
     render: function() {
 
-        console.log('flickr render');
-        console.log('image render: ' + this.props.image);
+        /*console.log('flickr render');
+        console.log('image render: ' + this.props.image);*/
 
-        var imageItem = <li className="list-group-image"><img src={this.props.image} /></li>;
+
         /*if (this.props.images.length > 0) {
             var imageItem = <li className="list-group-image"><img src={image} /></li>
 
@@ -27,8 +21,9 @@ var Login = React.createClass({
             });
         }*/
         //<img src="https://farm1.staticflickr.com/778/21513186802_951f457faa.jpg" />
-/*
-        */
+
+        var imageItem = <li className="list-group-image"><img src={this.props.image} /></li>;
+
         return (
             <div>
                 <ul className="list-group">

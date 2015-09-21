@@ -10,7 +10,7 @@ var _store = {
 };
 
 var loginStatus = function(result){
-    console.log('loginStatus result: ' + result);
+    //console.log('loginStatus result: ' + result);
     _store.result = result;
 };
 
