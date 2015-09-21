@@ -1,6 +1,7 @@
 var React = require('react');
 var loginActions = require('../actions/loginActions');
 
+var ENTER_KEY = 13;
 var Login = React.createClass({
 
     componentDidMount: function() {
@@ -13,6 +14,12 @@ var Login = React.createClass({
 
         if (user && pw) {
             loginActions.login({user: user, pw: pw});
+        }
+    },
+
+    keyPress: function(e) {
+        if (e.which == ENTER_KEY) {
+            this.submit();
         }
     },
 
@@ -32,7 +39,8 @@ var Login = React.createClass({
                         <div className="panel-body">
                             <input className="col-md-10 col-md-offset-1" type="text" ref="userInput" placeholder="User name" />
                             <br/>
-                            <input className="col-md-10 col-md-offset-1" type="password" ref="pwInput" placeholder="Password" />
+                            <input className="col-md-10 col-md-offset-1"
+                                   type="password" ref="pwInput" onKeyPress={this.keyPress} placeholder="Password" />
 
                         </div>
 

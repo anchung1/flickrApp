@@ -4,9 +4,12 @@ var appConstants = require('../constants/appConstants');
 var restUrl = "https://localhost:3001/";
 var flickrActions = {
 
-    flickrFetchAction: function() {
+    flickrFetchAction: function(count) {
         console.log('flickr fetch action');
-        var flickrUrl = restUrl + 'api/' + 'flickr';
+        var flickrUrl = restUrl + 'api/flickr';
+        if (count > 0) {
+            flickrUrl += "?count=" + count;
+        }
         $.get(flickrUrl).then(
             function(data) {
                 console.log(data);
