@@ -7,13 +7,11 @@ var LoadSave = React.createClass({
         var style = {
             marginRight: 10
         };
-        var savedBtn = <button className="btn btn-warning" onClick={this.props.handlerSaved} style={style}>Load Saved</button>
-        var liveBtn = <button className="btn btn-warning" onClick={this.props.handlerLive}>Load Live</button>
+        var savedBtn = <a className="list-group-item" onClick={this.props.handler}>Load Saved</a>
 
         return (
-            <div className='row'>
+            <div>
                 {savedBtn}
-                {liveBtn}
             </div>
         );
     }

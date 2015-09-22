@@ -4,9 +4,10 @@ var LoadLive = React.createClass({
 
     render: function() {
 
-        var button = <button className="btn btn-warning" onClick={this.props.handler}>Load Live</button>
+        var liveBtn =  <a className="list-group-item" onClick={this.props.handler}>Load Live</a>
+
         return (
-            <div>{button}</div>
+            <div>{liveBtn}</div>
         );
     }
 

@@ -6,6 +6,8 @@ var flickrActions = require('../actions/flickrActions');
 var ImageSave = require('./ImageSave');
 var LoadLive = require('./LoadLive');
 var LoadSaved = require('./LoadSaved');
+var ShowMsg = require('./ShowMsg');
+var FlickrSearch = require('./FlickrSearch');
 
 var fetchCount = 20;
 var FlickrContainer = React.createClass({
@@ -30,6 +32,7 @@ var FlickrContainer = React.createClass({
         flickrStore.addRestoreLiveListener(this._onRestoreLiveChange);
 
         flickrActions.flickrFetchAction(fetchCount);
+        //flickrActions.flickrSearchAction(fetchCount, 'girls');
 
     },
     componentWillUnmount: function () {
@@ -111,6 +114,8 @@ var FlickrContainer = React.createClass({
         if (this.state.imageIndex == this.maxIndex-1) {
             if (this.mode=='saved') return;
             flickrActions.flickrFetchAction(fetchCount);
+            //flickrActions.flickrSearchAction(fetchCount, 'girls');
+
             this.rightClicked = true;
             return;
         }
@@ -137,6 +142,11 @@ var FlickrContainer = React.createClass({
 
     },
 
+    searchText: function(value) {
+        console.log('search text');
+        console.log(value);
+    },
+
     render: function () {
 
         return (
@@ -144,16 +154,26 @@ var FlickrContainer = React.createClass({
                 <FlickrControl left={this.leftClick} right={this.rightClick}
                                index={this.state.imageIndex+1} max={this.maxIndex}></FlickrControl>
                 <br/>
-                <Flickr image={this.state.urls[this.state.imageIndex]}></Flickr>
-                <br/>
-                <ImageSave save={this.saveImage}
-                           msg={this.state.saveMsg.msg} error={this.state.saveMsg.error}></ImageSave>
+                <div className="container-fluid">
+                    <div className="row">
+                        <div className="col-md-6">
+                            <Flickr image={this.state.urls[this.state.imageIndex]}></Flickr>
+                        </div>
+                        <div className="col-md-5 col-md-offset-1">
+                            <div className="list-group">
+                                <ImageSave save={this.saveImage}></ImageSave>
+                                <LoadSaved handler={this.loadSaved}></LoadSaved>
+                                <LoadLive handler={this.loadLive}></LoadLive>
+                                <FlickrSearch handler={this.searchText}></FlickrSearch>
+                            </div>
 
+                        </div>
+                    </div>
+                </div>
                 <br/>
-                <LoadSaved handlerLive={this.loadLive} handlerSaved={this.loadSaved}></LoadSaved>
+                <ShowMsg msg={this.state.saveMsg.msg} error={this.state.saveMsg.error}></ShowMsg>
 
             </div>
-
         );
 
     }

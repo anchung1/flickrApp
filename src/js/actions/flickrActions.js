@@ -32,6 +32,44 @@ var flickrActions = {
         );  //lib does not support finally
     },
 
+    flickrSearchAction: function(count, text) {
+        //console.log('flickr fetch action');
+        var flickrUrl = restUrl + 'api/flickrSearch';
+        if (count > 0) {
+            flickrUrl += "?count=" + count;
+        }
+
+        if (!text) {
+            AppDispatcher.handleAction({
+                actionType: appConstants.FLICKR_URL_ERR,
+                data: {msg: 'requires tag'}
+            });
+            return;
+        }
+
+        flickrUrl += "&text=" + text;
+        $.get(flickrUrl).then(
+            function(data) {
+                console.log(data);
+                AppDispatcher.handleAction({
+                    actionType: appConstants.FLICKR_URL,
+                    data: data.urls
+                });
+            },
+            function(data) {
+                AppDispatcher.handleAction({
+                    actionType: appConstants.FLICKR_URL_ERR,
+                    data: {msg: 'no search result'}
+                });
+                //console.log('errored');
+            }
+        ).always(
+            function() {
+                //console.log('always fired');
+            }
+        );  //lib does not support finally
+    },
+
     saveImage: function(url) {
         console.log('save image ' + url);
 

@@ -19,6 +19,10 @@ function storeUrls(data) {
     _store.flickrUrls = data;
 }
 
+function saveErr(data) {
+    _store.flickrErr = data.msg;
+}
+
 function saveMsg(data) {
     _store.flickrSaveMsg = data;
 }

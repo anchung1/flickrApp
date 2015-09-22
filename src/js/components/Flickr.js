@@ -22,13 +22,12 @@ var Login = React.createClass({
         }*/
         //<img src="https://farm1.staticflickr.com/778/21513186802_951f457faa.jpg" />
 
-        var imageItem = <li className="list-group-image"><img src={this.props.image} /></li>;
+        //var imageItem = <li className="list-group-image"><img src={this.props.image}/></li>;
+        var imageItem = <img src={this.props.image}/>;
 
         return (
             <div>
-                <ul className="list-group">
-                    {imageItem}
-                </ul>
+                {imageItem}
             </div>
         );
     }
