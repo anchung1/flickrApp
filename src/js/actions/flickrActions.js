@@ -32,7 +32,7 @@ var flickrActions = {
         );  //lib does not support finally
     },
 
-    flickrSearchAction: function(count, text) {
+    flickrSearchAction: function(count, text, page) {
         //console.log('flickr fetch action');
         var flickrUrl = restUrl + 'api/flickrSearch';
         if (count > 0) {
@@ -41,25 +41,27 @@ var flickrActions = {
 
         if (!text) {
             AppDispatcher.handleAction({
-                actionType: appConstants.FLICKR_URL_ERR,
+                actionType: appConstants.FLICKR_SEARCH_ERR_EVENT,
                 data: {msg: 'requires tag'}
             });
             return;
         }
 
         flickrUrl += "&text=" + text;
+        if (page) flickrUrl += "&page=" + page;
+
         $.get(flickrUrl).then(
             function(data) {
                 console.log(data);
                 AppDispatcher.handleAction({
-                    actionType: appConstants.FLICKR_URL,
+                    actionType: appConstants.FLICKR_SEARCH_EVENT,
                     data: data.urls
                 });
             },
             function(data) {
                 AppDispatcher.handleAction({
-                    actionType: appConstants.FLICKR_URL_ERR,
-                    data: {msg: 'no search result'}
+                    actionType: appConstants.FLICKR_SEARCH_ERR_EVENT,
+                    data: {msg: 'no search result', data: data}
                 });
                 //console.log('errored');
             }

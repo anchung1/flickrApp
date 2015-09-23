@@ -9,7 +9,12 @@ var LoadSaved = require('./LoadSaved');
 var ShowMsg = require('./ShowMsg');
 var FlickrSearch = require('./FlickrSearch');
 
-var fetchCount = 20;
+var fetchCount = 10;
+
+function fetchSearch(count, searchText, page) {
+    flickrActions.flickrSearchAction(count, searchText, page);
+}
+
 var FlickrContainer = React.createClass({
     getInitialState: function () {
 
@@ -18,6 +23,7 @@ var FlickrContainer = React.createClass({
         this.currentUrls = [];
         this.mode = "live";
         this.liveIndex = 0;
+        this.searchOpt = {page: 0, text: ''};
 
         return {
             urls: flickrStore.getUrls(),
@@ -28,22 +34,25 @@ var FlickrContainer = React.createClass({
     componentDidMount: function () {
         flickrStore.addFlickrListener(this._onChange);
         flickrStore.addImageSaveListener(this._onImageSaveChange);
+
         flickrStore.addLoadSavedImageListener(this._onLoadSavedImageChange);
         flickrStore.addRestoreLiveListener(this._onRestoreLiveChange);
 
-        flickrActions.flickrFetchAction(fetchCount);
-        //flickrActions.flickrSearchAction(fetchCount, 'girls');
+        flickrStore.addFlickrSearchListener(this._onSearchChange);
 
+
+        flickrActions.flickrFetchAction(fetchCount);
     },
     componentWillUnmount: function () {
         flickrStore.removeFlickrListener(this._onChange);
         flickrStore.removeImageSaveListener(this._onImageSaveChange);
         flickrStore.removeLoadSavedImageListener(this._onLoadSavedImageChange);
         flickrStore.removeRestoreLiveListener(this._onRestoreLiveChange);
+        flickrStore.removeFlickrSearchListener(this._onSearchChange);
+
     },
 
-    _onChange: function () {
-        var moreUrls = flickrStore.getUrls();
+    addUrls: function(moreUrls) {
         var currentUrls = this.state.urls;
 
         moreUrls.forEach(function(url) {
@@ -60,7 +69,11 @@ var FlickrContainer = React.createClass({
             this.rightClicked = false;
             this.incrementIndex();
         }
+    },
 
+    _onChange: function () {
+        var moreUrls = flickrStore.getUrls();
+        this.addUrls(moreUrls);
     },
 
     _onImageSaveChange: function() {
@@ -73,8 +86,7 @@ var FlickrContainer = React.createClass({
     _onLoadSavedImageChange: function() {
         var savedUrls = flickrStore.getLoadSavedImages();
         this.maxIndex = savedUrls.length;
-        this.mode = 'saved';
-        this.liveIndex = this.state.imageIndex;
+
         this.setState({
             urls: savedUrls,
             imageIndex: 0
@@ -83,24 +95,30 @@ var FlickrContainer = React.createClass({
 
     _onRestoreLiveChange: function() {
         this.maxIndex = this.currentUrls.length;
-        this.mode = 'live';
         this.setState({
             urls: this.currentUrls,
             imageIndex: this.liveIndex
         })
     },
 
+    _onSearchChange: function() {
+        var searchUrls = flickrStore.getSearchUrls();
+        this.addUrls(searchUrls);
+    },
+
+    setIndex: function(val) {
+        this.setState({
+            imageIndex: val
+        });
+    },
+
     incrementIndex: function() {
         var index = this.state.imageIndex + 1;
-        this.setState({
-            imageIndex: index
-        });
+        this.setIndex(index);
     },
     decrementIndex: function() {
         var index = this.state.imageIndex - 1;
-        this.setState({
-            imageIndex: index
-        });
+        this.setIndex(index);
     },
 
     leftClick: function() {
@@ -112,9 +130,15 @@ var FlickrContainer = React.createClass({
 
     rightClick: function() {
         if (this.state.imageIndex == this.maxIndex-1) {
+
+            //this prevents loading of more images.
             if (this.mode=='saved') return;
-            flickrActions.flickrFetchAction(fetchCount);
-            //flickrActions.flickrSearchAction(fetchCount, 'girls');
+            if (this.mode=='live') flickrActions.flickrFetchAction(fetchCount);
+            if (this.mode=='search') {
+                var text = this.searchOpt.text;
+                var page = ++this.searchOpt.page;
+                fetchSearch(fetchCount, text, page);
+            }
 
             this.rightClicked = true;
             return;
@@ -134,17 +158,55 @@ var FlickrContainer = React.createClass({
     },
 
     loadLive: function() {
+        if (this.mode == 'live') return;
+
+        this.searchOpt = {page: 0, text: ''};
+
+        if (this.mode != 'live') {
+            this.state.urls = [];
+        }
+        this.mode = 'live';
         flickrActions.loadLiveImages();
     },
 
     loadSaved: function() {
+        if (this.mode == 'live') {
+            this.liveIndex = this.state.imageIndex;
+        }
+
+        this.searchOpt = {page: 0, text: ''};
+        this.mode = 'saved';
+
         flickrActions.loadSavedImages();
 
     },
 
     searchText: function(value) {
-        console.log('search text');
-        console.log(value);
+        if (this.mode == 'live') {
+            this.liveIndex = this.state.imageIndex;
+        }
+
+        if (value != this.searchOpt.text) {
+            this.searchOpt.page = 0;
+            this.searchOpt.text = value;
+        }
+
+        if (this.mode != 'search') {
+            this.state.urls = [];
+        }
+
+        this.mode = 'search';
+        fetchSearch(fetchCount, value, 0);
+    },
+
+    indexHandler: function(value) {
+
+        value -= 1;
+
+        if (value < 0) value = 0;
+        if (value >= this.maxIndex-1) value = this.maxIndex-1;
+        this.setIndex(value);
+
     },
 
     render: function () {
@@ -152,7 +214,8 @@ var FlickrContainer = React.createClass({
         return (
             <div>
                 <FlickrControl left={this.leftClick} right={this.rightClick}
-                               index={this.state.imageIndex+1} max={this.maxIndex}></FlickrControl>
+                               index={this.state.imageIndex+1} max={this.maxIndex}
+                                handler={this.indexHandler}></FlickrControl>
                 <br/>
                 <div className="container-fluid">
                     <div className="row">
