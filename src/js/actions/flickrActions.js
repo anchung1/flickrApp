@@ -2,6 +2,18 @@ var AppDispatcher = require('../dispatcher/AppDispatcher');
 var appConstants = require('../constants/appConstants');
 
 var restUrl = "https://localhost:3001/";
+
+function showMsg(msg, error) {
+    AppDispatcher.handleAction({
+        actionType: appConstants.FLICKR_SAVE_EVENT,
+        data: {msg: msg, error: error}
+    });
+}
+
+function showLoading() {
+    showMsg("Loading..", false);
+}
+
 var flickrActions = {
 
     flickrFetchAction: function(count) {
@@ -10,9 +22,11 @@ var flickrActions = {
         if (count > 0) {
             flickrUrl += "?count=" + count;
         }
+
+        //showLoading();
         $.get(flickrUrl).then(
             function(data) {
-                console.log(data);
+                //console.log(data);
                 AppDispatcher.handleAction({
                     actionType: appConstants.FLICKR_URL,
                     data: data.urls
@@ -50,12 +64,13 @@ var flickrActions = {
         flickrUrl += "&text=" + text;
         if (page) flickrUrl += "&page=" + page;
 
+        //showLoading();
         $.get(flickrUrl).then(
             function(data) {
-                console.log(data);
+                //console.log(data);
                 AppDispatcher.handleAction({
                     actionType: appConstants.FLICKR_SEARCH_EVENT,
-                    data: data.urls
+                    data: {urls: data.urls, search: text}
                 });
             },
             function(data) {
@@ -73,7 +88,7 @@ var flickrActions = {
     },
 
     saveImage: function(url) {
-        console.log('save image ' + url);
+        //console.log('save image ' + url);
 
         var flickrUrl = restUrl + 'api/flickrSave';
         var msg = "";
@@ -88,39 +103,40 @@ var flickrActions = {
             }
         ).always(
             function() {
-                AppDispatcher.handleAction({
-                    actionType: appConstants.FLICKR_SAVE_EVENT,
-                    data: {msg: msg, error: error}
-                });
+                showMsg(msg, error);
+
             }
         );
 
     },
 
     saveImageMsgClear: function() {
-        AppDispatcher.handleAction({
+        showMsg();
+        /*AppDispatcher.handleAction({
             actionType: appConstants.FLICKR_SAVE_EVENT,
             data: {}
-        })
+        })*/
     },
 
     loadSavedImages: function() {
-        console.log('fetch image ');
+        //console.log('fetch image ');
 
         var flickrUrl = restUrl + 'api/flickrSaved';
+        //showLoading();
+
         $.get(flickrUrl).then(
             function(data) {
 
                 AppDispatcher.handleAction({
-                    actionType: appConstants.FLICKR_SAVED_IMAGES_EVENT,
+                    actionType: appConstants.FLICKR_LOAD_EVENT,
                     data: data.urls
                 });
-                console.log('fetched: ');
-                console.log(data);
+                /*console.log('fetched: ');
+                console.log(data);*/
             },
             function(data) {
-                console.log('fetch failed: ');
-                console.log(data);
+                /*console.log('fetch failed: ');
+                console.log(data);*/
             }
         ).always(
             function() {
@@ -132,6 +148,12 @@ var flickrActions = {
     loadLiveImages: function() {
         AppDispatcher.handleAction({
             actionType: appConstants.FLICKR_RESTORE_LIVE_EVENT,
+            data: {}
+        })
+    },
+    loadSearchImages: function() {
+        AppDispatcher.handleAction({
+            actionType: appConstants.FLICKR_RESTORE_SEARCH_EVENT,
             data: {}
         })
     }

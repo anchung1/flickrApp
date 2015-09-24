@@ -6,7 +6,7 @@ var FlickrSearch = React.createClass({
     keyPress: function(event) {
         if (event.which == ENTER_KEY) {
             var value = this.refs.searchItem.getDOMNode().value;
-            this.refs.searchItem.getDOMNode().value = '';
+            //this.refs.searchItem.getDOMNode().value = '';
             this.props.handler(value);
         }
 
@@ -14,6 +14,7 @@ var FlickrSearch = React.createClass({
 
     hover: function(event) {
         this.refs.searchItem.getDOMNode().focus();
+        this.refs.searchItem.getDOMNode().select();
     },
 
     hoverOut: function(event) {

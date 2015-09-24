@@ -1,5 +1,9 @@
 var React = require('react');
-var flickrStore = require('../stores/flickrStore');
+
+var flickrLiveStore = require('../stores/flickrLiveStore');
+var flickrSearchStore = require('../stores/flickrSearchStore');
+var flickrSaveStore = require('../stores/flickrSaveStore');
+
 var Flickr = require('./Flickr');
 var FlickrControl = require('./FlickrControl');
 var flickrActions = require('../actions/flickrActions');
@@ -7,13 +11,35 @@ var ImageSave = require('./ImageSave');
 var LoadLive = require('./LoadLive');
 var LoadSaved = require('./LoadSaved');
 var ShowMsg = require('./ShowMsg');
+
 var FlickrSearch = require('./FlickrSearch');
 
-var fetchCount = 10;
+var fetchCount = 100;
 
+
+//*******Utility functions*******
 function fetchSearch(count, searchText, page) {
-    flickrActions.flickrSearchAction(count, searchText, page);
+    flickrActions.flickrSearchAction(count, searchText, page+1);
 }
+
+function clearMsg() {
+    flickrActions.saveImageMsgClear();
+}
+
+function saveIndex(mode, storage, index) {
+    if (mode == 'live') {
+        storage.live = index;
+    }
+
+    if (mode == 'saved') {
+        storage.saved = index;
+    }
+
+    if (mode == 'search') {
+        storage.search = index;
+    }
+}
+//*******End - Utility functions*******
 
 var FlickrContainer = React.createClass({
     getInitialState: function () {
@@ -22,47 +48,67 @@ var FlickrContainer = React.createClass({
         this.rightClicked = false;
         this.currentUrls = [];
         this.mode = "live";
+
+        this.savedIndex = {live: 0, saved: 0, search: 0};
         this.liveIndex = 0;
+        this.searchIndex = 0;
         this.searchOpt = {page: 0, text: ''};
 
         return {
-            urls: flickrStore.getUrls(),
+            urls: flickrLiveStore.getUrls(),
             imageIndex: 0,
-            saveMsg: flickrStore.getSaveMsg(),
+            saveMsg: flickrSaveStore.getMsg(),
         };
     },
     componentDidMount: function () {
-        flickrStore.addFlickrListener(this._onChange);
-        flickrStore.addImageSaveListener(this._onImageSaveChange);
+        flickrLiveStore.addFlickrListener(this._onChange);
+        flickrLiveStore.addRestoreLiveListener(this._onRestoreLiveChange);
 
-        flickrStore.addLoadSavedImageListener(this._onLoadSavedImageChange);
-        flickrStore.addRestoreLiveListener(this._onRestoreLiveChange);
+        flickrSearchStore.addFlickrListener(this._onSearchChange);
+        flickrSearchStore.addRestoreSearchListener(this._onRestoreSearchChange);
 
-        flickrStore.addFlickrSearchListener(this._onSearchChange);
-
+        flickrSaveStore.addSaveListener(this._onSaveChange);
+        flickrSaveStore.addLoadListener(this._onLoadChange);
 
         flickrActions.flickrFetchAction(fetchCount);
     },
     componentWillUnmount: function () {
-        flickrStore.removeFlickrListener(this._onChange);
-        flickrStore.removeImageSaveListener(this._onImageSaveChange);
-        flickrStore.removeLoadSavedImageListener(this._onLoadSavedImageChange);
-        flickrStore.removeRestoreLiveListener(this._onRestoreLiveChange);
-        flickrStore.removeFlickrSearchListener(this._onSearchChange);
+        flickrLiveStore.removeFlickrListener(this._onChange);
+        flickrLiveStore.removeRestoreLiveListener(this._onRestoreLiveChange);
+
+        flickrSearchStore.removeFlickrListener(this._onSearchChange);
+        flickrSearchStore.removeRestoreSearchListener(this._onRestoreSearchChange);
+
+        flickrSaveStore.removeSaveListener(this._onSaveChange);
+        flickrSaveStore.removeLoadListener(this._onLoadChange);
 
     },
 
-    addUrls: function(moreUrls) {
-        var currentUrls = this.state.urls;
-
-        moreUrls.forEach(function(url) {
-            currentUrls.push(url);
-        });
-
-        this.currentUrls = currentUrls;
+    //*******Store Events*******
+    _onChange: function () {
+        var moreUrls = flickrLiveStore.getUrls();
         this.setState({
-            urls: currentUrls
+            urls: moreUrls
         });
+
+        this.maxIndex = this.state.urls.length;
+        if (this.rightClicked) {
+            this.rightClicked = false;
+            this.incrementIndex();
+        }
+
+    },
+
+    _onSearchChange: function() {
+        var searchUrls = flickrSearchStore.getUrls();
+        this.setState({
+            urls: searchUrls
+        });
+
+        //new search item
+        if (this.searchOpt.page == 0) {
+            this.setIndex(0);
+        }
 
         this.maxIndex = this.state.urls.length;
         if (this.rightClicked) {
@@ -71,41 +117,45 @@ var FlickrContainer = React.createClass({
         }
     },
 
-    _onChange: function () {
-        var moreUrls = flickrStore.getUrls();
-        this.addUrls(moreUrls);
-    },
 
-    _onImageSaveChange: function() {
-        var msg = flickrStore.getSaveMsg();
+    _onSaveChange: function() {
+        var msg = flickrSaveStore.getMsg();
         this.setState({
             saveMsg: msg
         });
     },
 
-    _onLoadSavedImageChange: function() {
-        var savedUrls = flickrStore.getLoadSavedImages();
+    _onLoadChange: function() {
+        var savedUrls = flickrSaveStore.getUrls();
         this.maxIndex = savedUrls.length;
 
         this.setState({
             urls: savedUrls,
-            imageIndex: 0
+            imageIndex: this.savedIndex.saved
         })
     },
 
     _onRestoreLiveChange: function() {
-        this.maxIndex = this.currentUrls.length;
+        var urls = flickrLiveStore.getUrls();
+        this.maxIndex = urls.length;
         this.setState({
-            urls: this.currentUrls,
-            imageIndex: this.liveIndex
-        })
+            urls: urls,
+            imageIndex: this.savedIndex.live
+        });
     },
 
-    _onSearchChange: function() {
-        var searchUrls = flickrStore.getSearchUrls();
-        this.addUrls(searchUrls);
+    _onRestoreSearchChange: function() {
+        var urls = flickrSearchStore.getUrls();
+        this.maxIndex = urls.length;
+        this.setState({
+            urls: urls,
+            imageIndex: this.savedIndex.search
+        });
     },
+    //*******End - Store Events*******
 
+
+    //*******Index setting and navigation******
     setIndex: function(val) {
         this.setState({
             imageIndex: val
@@ -124,11 +174,14 @@ var FlickrContainer = React.createClass({
     leftClick: function() {
         if (this.state.imageIndex == 0) return;
 
-        this.clearMsg();
+        clearMsg();
         this.decrementIndex();
     },
 
     rightClick: function() {
+        //without this, same images will be fetched twice
+        if (this.rightClicked) return;
+
         if (this.state.imageIndex == this.maxIndex-1) {
 
             //this prevents loading of more images.
@@ -144,61 +197,13 @@ var FlickrContainer = React.createClass({
             return;
         }
 
-        this.clearMsg();
+        clearMsg();
         this.incrementIndex();
     },
+    //*******End - Index setting and navigation******
 
-    saveImage: function() {
-        var currentUrl = this.state.urls[this.state.imageIndex];
-        flickrActions.saveImage(currentUrl);
-    },
 
-    clearMsg: function() {
-        flickrActions.saveImageMsgClear();
-    },
-
-    loadLive: function() {
-        if (this.mode == 'live') return;
-
-        this.searchOpt = {page: 0, text: ''};
-
-        if (this.mode != 'live') {
-            this.state.urls = [];
-        }
-        this.mode = 'live';
-        flickrActions.loadLiveImages();
-    },
-
-    loadSaved: function() {
-        if (this.mode == 'live') {
-            this.liveIndex = this.state.imageIndex;
-        }
-
-        this.searchOpt = {page: 0, text: ''};
-        this.mode = 'saved';
-
-        flickrActions.loadSavedImages();
-
-    },
-
-    searchText: function(value) {
-        if (this.mode == 'live') {
-            this.liveIndex = this.state.imageIndex;
-        }
-
-        if (value != this.searchOpt.text) {
-            this.searchOpt.page = 0;
-            this.searchOpt.text = value;
-        }
-
-        if (this.mode != 'search') {
-            this.state.urls = [];
-        }
-
-        this.mode = 'search';
-        fetchSearch(fetchCount, value, 0);
-    },
-
+    //*******View event callbacks*******
     indexHandler: function(value) {
 
         value -= 1;
@@ -208,6 +213,44 @@ var FlickrContainer = React.createClass({
         this.setIndex(value);
 
     },
+    saveImage: function() {
+        if (this.mode == 'saved') return;
+        var currentUrl = this.state.urls[this.state.imageIndex];
+        flickrActions.saveImage(currentUrl);
+    },
+    loadLive: function() {
+        if (this.mode == 'live') return;
+        saveIndex(this.mode, this.savedIndex, this.state.imageIndex);
+
+
+        this.mode = 'live';
+        flickrActions.loadLiveImages();
+    },
+
+    loadSaved: function() {
+        if (this.mode == 'saved') return;
+        saveIndex(this.mode, this.savedIndex, this.state.imageIndex);
+
+        this.mode = 'saved';
+        flickrActions.loadSavedImages();
+
+    },
+    searchText: function(value) {
+        //if (this.mode == 'search') return;
+        saveIndex(this.mode, this.savedIndex, this.state.imageIndex);
+
+        this.mode = 'search';
+        if (value != this.searchOpt.text) {
+            this.searchOpt.page = 0;
+            this.searchOpt.text = value;
+            fetchSearch(fetchCount, value, 0);
+        } else {
+            flickrActions.loadSearchImages();
+
+        }
+
+    },
+    //*******End - View event callbacks*******
 
     render: function () {
 
