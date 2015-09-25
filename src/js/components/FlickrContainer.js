@@ -71,6 +71,8 @@ var FlickrContainer = React.createClass({
         flickrSaveStore.addLoadListener(this._onLoadChange);
 
         flickrActions.flickrFetchAction(fetchCount);
+
+        document.body.background = 'src/leaf-green-background.jpg';
     },
     componentWillUnmount: function () {
         flickrLiveStore.removeFlickrListener(this._onChange);

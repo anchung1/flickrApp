@@ -14,7 +14,8 @@ var path = {
     DEST: 'dist',
     DEST_BUILD: 'dist/build',
     DEST_SRC: 'dist/src',
-    ENTRY_POINT: './src/js/App.js'
+    ENTRY_POINT: './src/js/App.js',
+    PUBLIC: 'src/public/*'
 };
 
 gulp.task('replaceHTML', function() {
@@ -24,7 +25,8 @@ gulp.task('replaceHTML', function() {
 });
 
 gulp.task('copy', function() {
-    gulp.src(path.HTML).pipe(gulp.dest(path.DEST));
+    //gulp.src(path.HTML).pipe(gulp.dest(path.DEST));
+    gulp.src(path.PUBLIC).pipe(gulp.dest(path.DEST_SRC));
 });
 
 gulp.task('watch', function() {
@@ -59,4 +61,4 @@ gulp.task('css', function () {
 
 //use this command to find errors in build
 //browserify -t reactify -r react -r ./src/js/App.js > dist/src/bundle.js
-gulp.task('default', ['watch', 'replaceHTML']);
+gulp.task('default', ['watch', 'replaceHTML', 'copy']);

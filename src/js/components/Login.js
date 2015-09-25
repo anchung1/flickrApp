@@ -6,6 +6,9 @@ var Login = React.createClass({
 
     componentDidMount: function() {
         this.refs.userInput.getDOMNode().focus();
+
+        console.log(document.body.background);
+        document.body.background = 'src/green-background.jpg';
     },
 
     submit: function() {
@@ -23,39 +26,39 @@ var Login = React.createClass({
         }
     },
 
+    createAccount: function(e) {
+        console.log('create account');
+    },
+
     render: function() {
 
+
+        var headerStyle = {
+
+        };
+
+        var inputStyle = {
+        };
         //console.log('render Login');
-        var header = <div></div>;
-        if (!this.props.status) {
-            header = <h3 className="text-center">Nick's Login</h3>
-        }
-
-        var body = <div></div>;
-        if (!this.props.status) {
-            body =
+        var body =
                 <div>
-                    <div className="panel panel-default col-md-8">
-                        <div className="panel-body">
-                            <input className="col-md-10 col-md-offset-1" type="text" ref="userInput" placeholder="User name" />
-                            <br/>
-                            <input className="col-md-10 col-md-offset-1"
-                                   type="password" ref="pwInput" onKeyPress={this.keyPress} placeholder="Password" />
+                    <div className="panel-heading text-center" style={headerStyle}><h3>Nick's Login</h3></div>
 
-                        </div>
-
-                        <div className="panel-footer">
-                            <button className="btn btn-primary" onClick={this.submit}>Submit</button>
-                        </div>
+                    <div className="panel-body">
+                        <input className="col-md-10 col-md-offset-1" type="text" ref="userInput" placeholder="User name" style={inputStyle}/>
+                        <br/>
+                        <input className="col-md-10 col-md-offset-1"
+                               type="password" ref="pwInput" onKeyPress={this.keyPress} placeholder="Password" style={inputStyle}/>
 
                     </div>
+
+                    <a onClick={this.props.createAccount}>Create Account</a>
                 </div>
             ;
-        }
+
 
         return (
             <div>
-                {header}
                 {body}
             </div>
 

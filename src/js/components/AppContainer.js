@@ -23,9 +23,11 @@ var AppContainer = React.createClass({
         })
     },
     render: function () {
-        var activeComponent = <LoginContainer login={this.state.login}></LoginContainer>
+        var activeComponent;
         if (this.state.login) {
             activeComponent = <FlickrContainer></FlickrContainer>
+        } else {
+            activeComponent = <LoginContainer></LoginContainer>
         }
 
         return (
