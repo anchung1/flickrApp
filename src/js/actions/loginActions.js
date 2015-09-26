@@ -23,6 +23,31 @@ var loginActions = {
                 });
             }
         );
+    },
+
+    create: function(data) {
+        /*AppDispatcher.handleAction({
+            actionType: appConstants.ACCT_CREATE_EVENT,
+            data: {result: true}
+        });*/
+
+        var createUrl = restUrl + 'users/' + 'create';
+        var success = false;
+        $.post(createUrl, {name: data.user, password: data.pw, email: data.email}).then(
+            function() {
+                success = true;
+            },
+            function() {
+                success = false;
+            }
+        ).always(
+            function() {
+                AppDispatcher.handleAction({
+                    actionType: appConstants.ACCT_CREATE_EVENT,
+                    data: {result: success}
+                });
+            }
+        );
     }
 
 };
