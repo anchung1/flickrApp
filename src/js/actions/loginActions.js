@@ -25,6 +25,13 @@ var loginActions = {
         );
     },
 
+    logout: function() {
+        AppDispatcher.handleAction({
+            actionType: appConstants.LOGIN_EVENT,
+            data: {result: false}
+        });
+    },
+
     create: function(data) {
         /*AppDispatcher.handleAction({
             actionType: appConstants.ACCT_CREATE_EVENT,

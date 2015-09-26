@@ -13,6 +13,7 @@ var LoadSaved = require('./LoadSaved');
 var ShowMsg = require('./ShowMsg');
 
 var FlickrSearch = require('./FlickrSearch');
+var keepAliveActions = require('../actions/keepAliveActions');
 
 var fetchCount = 100;
 
@@ -174,6 +175,8 @@ var FlickrContainer = React.createClass({
     },
 
     leftClick: function() {
+        keepAliveActions.keepAlive();
+
         if (this.state.imageIndex == 0) return;
 
         clearMsg();
@@ -181,6 +184,8 @@ var FlickrContainer = React.createClass({
     },
 
     rightClick: function() {
+        keepAliveActions.keepAlive();
+
         //without this, same images will be fetched twice
         if (this.rightClicked) return;
 
