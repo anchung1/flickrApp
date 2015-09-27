@@ -5,7 +5,7 @@ var EventEmitter = require('events').EventEmitter;
 
 var CHANGE_SAVE_EVENT = "changeSaveEvent";
 var CHANGE_LOAD_EVENT = "changeLoadEvent";
-
+var AUTOPLAY_STOP_EVENT = 'autoplayStopEvent';
 
 var _store = {
     flickrMsg: {},
@@ -36,6 +36,13 @@ var flickrSaveStore = objectAssign({}, EventEmitter.prototype, {
         this.removeListener(CHANGE_LOAD_EVENT, cb);
     },
 
+    addAutoPlayStopListener: function(cb) {
+        this.on(AUTOPLAY_STOP_EVENT, cb);
+    },
+    removeAutoPlayStopListener: function(cb) {
+        this.removeListener(AUTOPLAY_STOP_EVENT, cb);
+    },
+
     getMsg: function() {
         return _store.flickrMsg;
     },
@@ -57,6 +64,8 @@ AppDispatcher.register(function(payload){
         case appConstants.FLICKR_LOAD_EVENT:
             saveUrls(action.data);
             flickrSaveStore.emit(CHANGE_LOAD_EVENT);
+            flickrSaveStore.emit(AUTOPLAY_STOP_EVENT);
+
             break;
 
 

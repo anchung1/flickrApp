@@ -15,9 +15,9 @@ var AutoPlay = require('./AutoPlay');
 
 var FlickrSearch = require('./FlickrSearch');
 var keepAliveActions = require('../actions/keepAliveActions');
+var loadConstants = require('../constants/loadConstants');
 
 var fetchCount = 100;
-
 
 //*******Utility functions*******
 function fetchSearch(count, searchText, page) {
@@ -46,7 +46,6 @@ function saveIndex(mode, storage, index) {
 var FlickrContainer = React.createClass({
     getInitialState: function () {
 
-        this.maxIndex = fetchCount;
         this.rightClicked = false;
         this.currentUrls = [];
         this.mode = "live";
@@ -56,10 +55,15 @@ var FlickrContainer = React.createClass({
         this.searchIndex = 0;
         this.searchOpt = {page: 0, text: ''};
 
+        var okIcon = [false, false, false];
+        okIcon[loadConstants.indexLoadLive] = true;
+
         return {
             urls: flickrLiveStore.getUrls(),
             imageIndex: 0,
+            maxIndex: fetchCount,
             saveMsg: flickrSaveStore.getMsg(),
+            okIcon: okIcon
         };
     },
     componentDidMount: function () {
@@ -88,6 +92,12 @@ var FlickrContainer = React.createClass({
 
     },
 
+    setMaxIndex: function(val) {
+        this.setState({
+            maxIndex: val
+        });
+    },
+
     //*******Store Events*******
     _onChange: function () {
         var moreUrls = flickrLiveStore.getUrls();
@@ -95,7 +105,7 @@ var FlickrContainer = React.createClass({
             urls: moreUrls
         });
 
-        this.maxIndex = this.state.urls.length;
+        this.setMaxIndex(this.state.urls.length);
         if (this.rightClicked) {
             this.rightClicked = false;
             this.incrementIndex();
@@ -114,7 +124,7 @@ var FlickrContainer = React.createClass({
             this.setIndex(0);
         }
 
-        this.maxIndex = this.state.urls.length;
+        this.setMaxIndex(this.state.urls.length);
         if (this.rightClicked) {
             this.rightClicked = false;
             this.incrementIndex();
@@ -131,7 +141,7 @@ var FlickrContainer = React.createClass({
 
     _onLoadChange: function() {
         var savedUrls = flickrSaveStore.getUrls();
-        this.maxIndex = savedUrls.length;
+        this.setMaxIndex(savedUrls.length);
 
         this.setState({
             urls: savedUrls,
@@ -141,7 +151,7 @@ var FlickrContainer = React.createClass({
 
     _onRestoreLiveChange: function() {
         var urls = flickrLiveStore.getUrls();
-        this.maxIndex = urls.length;
+        this.setMaxIndex(urls.length);
         this.setState({
             urls: urls,
             imageIndex: this.savedIndex.live
@@ -150,7 +160,7 @@ var FlickrContainer = React.createClass({
 
     _onRestoreSearchChange: function() {
         var urls = flickrSearchStore.getUrls();
-        this.maxIndex = urls.length;
+        this.setMaxIndex(urls.length);
         this.setState({
             urls: urls,
             imageIndex: this.savedIndex.search
@@ -177,6 +187,7 @@ var FlickrContainer = React.createClass({
 
     leftClick: function() {
         keepAliveActions.keepAlive();
+        flickrActions.autoPlayStop();
 
         if (this.state.imageIndex == 0) return;
 
@@ -190,7 +201,7 @@ var FlickrContainer = React.createClass({
         //without this, same images will be fetched twice
         if (this.rightClicked) return;
 
-        if (this.state.imageIndex == this.maxIndex-1) {
+        if (this.state.imageIndex == this.state.maxIndex-1) {
 
             //this prevents loading of more images.
             if (this.mode=='saved') return;
@@ -217,7 +228,7 @@ var FlickrContainer = React.createClass({
         value -= 1;
 
         if (value < 0) value = 0;
-        if (value >= this.maxIndex-1) value = this.maxIndex-1;
+        if (value >= this.state.maxIndex-1) value = this.state.maxIndex-1;
         this.setIndex(value);
 
     },
@@ -233,6 +244,9 @@ var FlickrContainer = React.createClass({
 
         this.mode = 'live';
         flickrActions.loadLiveImages();
+
+        this.setOkIcon(loadConstants.indexLoadLive);
+
     },
 
     loadSaved: function() {
@@ -241,6 +255,9 @@ var FlickrContainer = React.createClass({
 
         this.mode = 'saved';
         flickrActions.loadSavedImages();
+
+        this.setOkIcon(loadConstants.indexLoadSaved);
+
 
     },
     searchText: function(value) {
@@ -257,11 +274,24 @@ var FlickrContainer = React.createClass({
 
         }
 
+        this.setOkIcon(loadConstants.indexLoadSearch);
+
     },
     autoPlay: function() {
         //console.log('auto play');
         this.rightClick();
     },
+
+    setOkIcon: function(index) {
+
+        var icons = [false, false, false];
+        icons[index] = true;
+
+        this.setState({
+            okIcon: icons
+        });
+    },
+
 
     //*******End - View event callbacks*******
 
@@ -270,7 +300,7 @@ var FlickrContainer = React.createClass({
         return (
             <div>
                 <FlickrControl left={this.leftClick} right={this.rightClick}
-                               index={this.state.imageIndex+1} max={this.maxIndex}
+                               index={this.state.imageIndex+1} max={this.state.maxIndex}
                                 handler={this.indexHandler}></FlickrControl>
                 <br/>
                 <div className="container-fluid">
@@ -281,9 +311,9 @@ var FlickrContainer = React.createClass({
                         <div className="col-md-5 col-md-offset-1">
                             <div className="list-group">
                                 <ImageSave save={this.saveImage}></ImageSave>
-                                <LoadSaved handler={this.loadSaved}></LoadSaved>
-                                <LoadLive handler={this.loadLive}></LoadLive>
-                                <FlickrSearch handler={this.searchText}></FlickrSearch>
+                                <LoadSaved handler={this.loadSaved} ok={this.state.okIcon}></LoadSaved>
+                                <LoadLive handler={this.loadLive} ok={this.state.okIcon}></LoadLive>
+                                <FlickrSearch handler={this.searchText} ok={this.state.okIcon}></FlickrSearch>
                             </div>
 
 

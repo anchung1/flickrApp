@@ -1,4 +1,8 @@
 var React = require('react');
+var flickrLiveStore = require('../stores/flickrLiveStore');
+var flickrSaveStore = require('../stores/flickrSaveStore');
+var flickrSearchStore = require('../stores/flickrSearchStore');
+
 
 var timerID;
 
@@ -15,6 +19,20 @@ var AutoPlay = React.createClass({
     componentDidMount: function () {
         var node = this.refs.slider.getDOMNode();
         node.value = this.state.sliderVal;
+
+        flickrLiveStore.addAutoPlayStopListener(this._autoPlayStop);
+        flickrSaveStore.addAutoPlayStopListener(this._autoPlayStop);
+        flickrSearchStore.addAutoPlayStopListener(this._autoPlayStop);
+    },
+
+    componentWillUnmount: function () {
+        flickrLiveStore.removeAutoPlayStopListener(this._autoPlayStop);
+        flickrSaveStore.removeAutoPlayStopListener(this._autoPlayStop);
+        flickrSearchStore.removeAutoPlayStopListener(this._autoPlayStop);
+    },
+
+    _autoPlayStop: function() {
+        this.stopClick();
     },
 
     doPlay: function(mode) {
@@ -68,11 +86,20 @@ var AutoPlay = React.createClass({
             top: '-3px'
         };
 
+        var msgElem;
+        if (this.state.message=='Stop') {
+            msgElem = <span className="label label-danger col-md-offset-2 col-xs-offset-2 col-sm-offset-2" style={msgStyle}>{this.state.message}</span>
+
+        } else {
+            msgElem = <span className="label label-primary col-md-offset-2 col-xs-offset-2 col-sm-offset-2" style={msgStyle}>{this.state.message}</span>
+
+        }
+
         return (
             <div className='row' style={{'marginLeft': '0', 'marginRight': '0'}}>
                 <span className="glyphicon glyphicon-stop" onClick={this.stopClick} style={glyphStopStyle}></span>
                 <span className="glyphicon glyphicon-play" onClick={this.playClick} style={glyphPlayStyle}></span>
-                <span className="label label-info col-md-offset-2 col-xs-offset-2 col-sm-offset-2" style={msgStyle}>{this.state.message}</span>
+                {msgElem}
                 <span className="pull-right">Play Speed: 1 frame/{this.state.sliderVal} sec</span>
                 <input ref='slider' type='range' min='0.5' max='5.0' step='0.5' onChange={this.sliderEvent}/>
             </div>

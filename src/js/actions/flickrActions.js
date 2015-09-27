@@ -156,6 +156,13 @@ var flickrActions = {
             actionType: appConstants.FLICKR_RESTORE_SEARCH_EVENT,
             data: {}
         })
+    },
+
+    autoPlayStop: function() {
+        AppDispatcher.handleAction({
+            actionType: appConstants.FLICKR_AUTOPLAY_STOP_EVENT,
+            data: {}
+        })
     }
 };
 
