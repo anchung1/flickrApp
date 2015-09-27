@@ -21,7 +21,7 @@ function keepInit() {
 
 function keepFunc() {
     if(countEvent == countSave) {
-        //loginActions.logout();
+        loginActions.logout();
     } else {
         countSave = countEvent;
         setTimeout(keepFunc, delay);
