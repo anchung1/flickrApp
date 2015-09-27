@@ -18,7 +18,7 @@ var FlickrSearch = React.createClass({
     },
 
     hoverOut: function(event) {
-        this.refs.searchItem.getDOMNode().blur();
+        //this.refs.searchItem.getDOMNode().blur();
     },
 
     render: function() {
