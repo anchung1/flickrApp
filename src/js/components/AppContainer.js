@@ -10,7 +10,7 @@ var _ = require('lodash');
 
 var countEvent = 0;
 var countSave = 0;
-var delay = 30000;
+var delay = 300000;
 
 function keepInit() {
     countEvent = 0;
@@ -21,7 +21,7 @@ function keepInit() {
 
 function keepFunc() {
     if(countEvent == countSave) {
-        loginActions.logout();
+        //loginActions.logout();
     } else {
         countSave = countEvent;
         setTimeout(keepFunc, delay);

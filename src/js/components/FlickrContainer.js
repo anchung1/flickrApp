@@ -11,6 +11,7 @@ var ImageSave = require('./ImageSave');
 var LoadLive = require('./LoadLive');
 var LoadSaved = require('./LoadSaved');
 var ShowMsg = require('./ShowMsg');
+var AutoPlay = require('./AutoPlay');
 
 var FlickrSearch = require('./FlickrSearch');
 var keepAliveActions = require('../actions/keepAliveActions');
@@ -257,6 +258,11 @@ var FlickrContainer = React.createClass({
         }
 
     },
+    autoPlay: function() {
+        //console.log('auto play');
+        this.rightClick();
+    },
+
     //*******End - View event callbacks*******
 
     render: function () {
@@ -279,6 +285,9 @@ var FlickrContainer = React.createClass({
                                 <LoadLive handler={this.loadLive}></LoadLive>
                                 <FlickrSearch handler={this.searchText}></FlickrSearch>
                             </div>
+
+
+                            <AutoPlay handler={this.autoPlay}></AutoPlay>
 
                         </div>
                     </div>
