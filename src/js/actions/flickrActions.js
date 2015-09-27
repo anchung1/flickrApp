@@ -46,7 +46,7 @@ var flickrActions = {
         );  //lib does not support finally
     },
 
-    flickrSearchAction: function(count, text, page) {
+    flickrDoSearch: function(count, text, page, event) {
         //console.log('flickr fetch action');
         var flickrUrl = restUrl + 'api/flickrSearch';
         if (count > 0) {
@@ -69,7 +69,7 @@ var flickrActions = {
             function(data) {
                 //console.log(data);
                 AppDispatcher.handleAction({
-                    actionType: appConstants.FLICKR_SEARCH_EVENT,
+                    actionType: event,
                     data: {urls: data.urls, search: text}
                 });
             },
@@ -85,6 +85,14 @@ var flickrActions = {
                 //console.log('always fired');
             }
         );  //lib does not support finally
+    },
+
+    flickrSearchAction: function(count, text, page) {
+        this.flickrDoSearch(count, text, page, appConstants.FLICKR_SEARCH_EVENT);
+    },
+
+    flickrNewSearchAction: function(count, text, page) {
+        this.flickrDoSearch(count, text, page, appConstants.FLICKR_NEW_SEARCH_EVENT);
     },
 
     saveImage: function(url) {

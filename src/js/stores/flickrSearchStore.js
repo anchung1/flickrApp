@@ -64,6 +64,11 @@ AppDispatcher.register(function(payload){
         case appConstants.FLICKR_SEARCH_EVENT:
             storeUrls(action.data.urls, action.data.search);
             flickrSearchStore.emit(CHANGE_EVENT);
+            //flickrSearchStore.emit(AUTOPLAY_STOP_EVENT);
+            break;
+        case appConstants.FLICKR_NEW_SEARCH_EVENT:
+            storeUrls(action.data.urls, action.data.search);
+            flickrSearchStore.emit(CHANGE_EVENT);
             flickrSearchStore.emit(AUTOPLAY_STOP_EVENT);
             break;
         case appConstants.FLICKR_SEARCH_ERR_EVENT:

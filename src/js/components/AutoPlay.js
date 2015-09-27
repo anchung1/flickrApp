@@ -32,6 +32,7 @@ var AutoPlay = React.createClass({
     },
 
     _autoPlayStop: function() {
+        console.log('autoplay stop');
         this.stopClick();
     },
 
@@ -57,14 +58,14 @@ var AutoPlay = React.createClass({
 
     stopClick: function() {
         this.setState({
-            message: 'Stop'
+            message: 'Stopped'
         });
         if (timerID) clearTimeout(timerID);
     },
 
     playClick: function() {
         this.setState({
-            message: 'Play'
+            message: 'Playing'
         });
         this.doPlay();
     },
@@ -87,7 +88,7 @@ var AutoPlay = React.createClass({
         };
 
         var msgElem;
-        if (this.state.message=='Stop') {
+        if (this.state.message=='Stopped') {
             msgElem = <span className="label label-danger col-md-offset-2 col-xs-offset-2 col-sm-offset-2" style={msgStyle}>{this.state.message}</span>
 
         } else {

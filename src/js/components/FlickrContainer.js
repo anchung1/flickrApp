@@ -261,15 +261,18 @@ var FlickrContainer = React.createClass({
 
     },
     searchText: function(value) {
-        //if (this.mode == 'search') return;
+        if (this.mode == 'search' && value == this.searchOpt.text) return;
         saveIndex(this.mode, this.savedIndex, this.state.imageIndex);
 
         this.mode = 'search';
         if (value != this.searchOpt.text) {
+            console.log('doing new search');
             this.searchOpt.page = 0;
             this.searchOpt.text = value;
-            fetchSearch(fetchCount, value, 0);
+            flickrActions.flickrNewSearchAction(fetchCount, value, 1);
+
         } else {
+            console.log('same search found');
             flickrActions.loadSearchImages();
 
         }
