@@ -17,9 +17,10 @@ var AutoPlay = React.createClass({
         node.value = this.state.sliderVal;
     },
 
-    doPlay: function() {
+    doPlay: function(mode) {
 
-        if (timerID) this.props.handler();
+
+        if (timerID && !mode) this.props.handler();
         if (timerID) clearTimeout(timerID);
 
         var delay = this.state.sliderVal * 1000;
@@ -33,7 +34,7 @@ var AutoPlay = React.createClass({
             sliderVal: value
         });
 
-        this.doPlay();
+        this.doPlay('preventSlide');
     },
 
     stopClick: function() {
@@ -71,7 +72,7 @@ var AutoPlay = React.createClass({
             <div className='row' style={{'marginLeft': '0', 'marginRight': '0'}}>
                 <span className="glyphicon glyphicon-stop" onClick={this.stopClick} style={glyphStopStyle}></span>
                 <span className="glyphicon glyphicon-play" onClick={this.playClick} style={glyphPlayStyle}></span>
-                <span className="label label-info col-md-offset-2" style={msgStyle}>{this.state.message}</span>
+                <span className="label label-info col-md-offset-2 col-xs-offset-2 col-sm-offset-2" style={msgStyle}>{this.state.message}</span>
                 <span className="pull-right">Play Speed: 1 frame/{this.state.sliderVal} sec</span>
                 <input ref='slider' type='range' min='0.5' max='5.0' step='0.5' onChange={this.sliderEvent}/>
             </div>
