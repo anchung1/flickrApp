@@ -39,12 +39,12 @@ var FlickrControl = React.createClass({
 
         return(
             <div className="row text-center" onMouseOver={this.hover} onMouseOut={this.hoverOut}>
-                <span className="glyphicon glyphicon-chevron-left" style={style} onClick={this.props.left}></span>
+                <span id='idcontrolleft' className="glyphicon glyphicon-chevron-left" style={style} onClick={this.props.left}></span>
                     <span className="label label-info">Image: </span>
                     <input type="text" ref="inputItem" placeholder={this.props.index} style={inputStyle} onKeyPress={this.keyPress}/>
                     <span className="label label-info">/{this.props.max}</span>
 
-                <span className="glyphicon glyphicon-chevron-right" style={style} onClick={this.props.right}></span>
+                <span id='idcontrolright' className="glyphicon glyphicon-chevron-right" style={style} onClick={this.props.right}></span>
             </div>
         );
     }

@@ -71,6 +71,7 @@ var AutoPlay = React.createClass({
     },
 
     render: function() {
+
         var glyphStopStyle = {
             fontSize: '20px',
             marginRight: '15px',
@@ -98,11 +99,11 @@ var AutoPlay = React.createClass({
 
         return (
             <div className='row' style={{'marginLeft': '0', 'marginRight': '0'}}>
-                <span className="glyphicon glyphicon-stop" onClick={this.stopClick} style={glyphStopStyle}></span>
-                <span className="glyphicon glyphicon-play" onClick={this.playClick} style={glyphPlayStyle}></span>
+                <span id='idcontrolstop' className="glyphicon glyphicon-stop" onClick={this.stopClick} style={glyphStopStyle}></span>
+                <span id='idcontrolplay' className="glyphicon glyphicon-play" onClick={this.playClick} style={glyphPlayStyle}></span>
                 {msgElem}
                 <span className="pull-right">Play Speed: 1 frame/{this.state.sliderVal} sec</span>
-                <input ref='slider' type='range' min='0.5' max='5.0' step='0.5' onChange={this.sliderEvent}/>
+                <input id='idcontrolslider' ref='slider' type='range' min='0.5' max='5.0' step='0.5' onChange={this.sliderEvent}/>
             </div>
         );
     }
